@@ -1,15 +1,13 @@
 package com.github.sh0nk.matplotlib4j;
 
 import com.github.sh0nk.matplotlib4j.builder.*;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
+//import com.google.common.base.Joiner;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class PlotImpl implements Plot {
-    @VisibleForTesting
     List<Builder> registeredBuilders = new LinkedList<>();
     private List<Builder> showBuilders = new LinkedList<>();
 
@@ -21,7 +19,6 @@ public class PlotImpl implements Plot {
         this.dryRun = dryRun;
     }
 
-    @VisibleForTesting
     PlotImpl(boolean dryRun) {
         this(PythonConfig.systemDefaultPythonConfig(), dryRun);
     }
@@ -152,7 +149,7 @@ public class PlotImpl implements Plot {
         registeredBuilders.forEach(b -> scriptLines.add(b.build()));
         showBuilders.forEach(b -> scriptLines.add(b.build()));
         PyCommand command = new PyCommand(pythonConfig);
-        command.execute(Joiner.on('\n').join(scriptLines));
+        command.execute(String.join("\n", scriptLines));
     }
 
     /**
@@ -176,7 +173,7 @@ public class PlotImpl implements Plot {
         }
 
         PyCommand command = new PyCommand(pythonConfig);
-        command.execute(Joiner.on('\n').join(scriptLines));
+        command.execute(String.join("\n", scriptLines));
 
         // After showing, registered plot is cleared
         registeredBuilders.clear();

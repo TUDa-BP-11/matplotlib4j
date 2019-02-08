@@ -1,13 +1,16 @@
 package com.github.sh0nk.matplotlib4j;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import com.google.common.base.Strings;
+//import com.google.common.collect.Lists;
+//import com.google.common.io.Files;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,16 +22,16 @@ public class PyCommand {
         this.pythonConfig = pythonConfig;
     }
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PyCommand.class);
+//    private final static Logger LOGGER = LoggerFactory.getLogger(PyCommand.class);
 
     private final static Pattern ERROR_PAT = Pattern.compile("^.+Error:");
 
     private List<String> buildCommandArgs(String scriptPath) {
         StringBuilder shell = new StringBuilder();
-        if (!Strings.isNullOrEmpty(pythonConfig.getPyenv())) {
+        if (pythonConfig.getPyenv() != null && !pythonConfig.getPyenv().isEmpty()) {
             shell.append("pyenv shell ").append(pythonConfig.getPyenv()).append("; ");
 
-            if (!Strings.isNullOrEmpty(pythonConfig.getVirtualenv())) {
+            if (pythonConfig.getVirtualenv() != null && !pythonConfig.getVirtualenv().isEmpty()) {
                 shell.append("export PYENV_VIRTUALENV_DISABLE_PROMPT=1; ");
                 shell.append("pyenv activate ").append(pythonConfig.getVirtualenv()).append("; ");
             }
@@ -36,17 +39,28 @@ public class PyCommand {
         }
 
         List<String> com;
-        if (!Strings.isNullOrEmpty(pythonConfig.getPythonBinPath())) {
-            com = Lists.newArrayList(pythonConfig.getPythonBinPath(), scriptPath);
+        if (pythonConfig.getPythonBinPath() != null &&!pythonConfig.getPythonBinPath().isEmpty()) {
+            com = new ArrayList();
+            com.add(pythonConfig.getPythonBinPath());
+            com.add(scriptPath);
+//            com = Lists.newArrayList(pythonConfig.getPythonBinPath(), scriptPath);
         } else if (shell.length() != 0) {
             // -l: Use login shell
-            com = Lists.newArrayList("bash", "-l", "-c", shell.toString());
+            com = new ArrayList();
+            com.add("bash");
+            com.add("-l");
+            com.add("-c");
+            com.add(shell.toString());
+//            com = Lists.newArrayList("bash", "-l", "-c", shell.toString());
         } else {
             // system's default
-            com = Lists.newArrayList("python", scriptPath);
+            com = new ArrayList();
+            com.add("python");
+            com.add(scriptPath);
+//                    Lists.newArrayList("python", scriptPath);
         }
 
-        LOGGER.debug("Commands... : {}", com);
+//        LOGGER.debug("Commands... : {}", com);
         return com;
     }
 
@@ -80,10 +94,10 @@ public class PyCommand {
 
         String msg = sb.toString();
         if (hasError) {
-            LOGGER.error(msg);
+//            LOGGER.error(msg);
             throw new PythonExecutionException("Python execution error: " + msg);
         } else {
-            LOGGER.warn(msg);
+//            LOGGER.warn(msg);
         }
     }
 
@@ -94,14 +108,18 @@ public class PyCommand {
     }
 
     public void execute(String pythonScript) throws IOException, PythonExecutionException {
-        File tmpDir = Files.createTempDir();
-        tmpDir.deleteOnExit();
-        File script = new File(tmpDir, "exec.py");
+//        File tmpDir = Files.createTempDir();
+        Path tmpDir = Files.createTempDirectory("tmp");
+        tmpDir.toFile().deleteOnExit();
+//        tmpDir.deleteOnExit();
+        File script = new File(tmpDir.toFile(), "exec.py");
 
         writeFile(pythonScript, script);
 
         String scriptPath = Paths.get(script.toURI()).toAbsolutePath().toString();
         command(buildCommandArgs(scriptPath));
-        tmpDir.delete();
+        tmpDir.toFile().delete();
+//        tmpDir.delete();
+        
     }
 }

@@ -1,9 +1,10 @@
 package com.github.sh0nk.matplotlib4j.builder;
 
 import com.github.sh0nk.matplotlib4j.TypeConversion;
-import com.google.common.base.Joiner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.stream.Collectors.joining;
+//import com.google.common.base.Joiner;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class CompositeBuilder<T extends Builder> implements Builder {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CompositeBuilder.class);
+//    private final static Logger LOGGER = LoggerFactory.getLogger(CompositeBuilder.class);
 
     private List<Object> args = new LinkedList<>();
     private Map<String, Object> kwargs = new HashMap<>();
@@ -115,14 +116,18 @@ public class CompositeBuilder<T extends Builder> implements Builder {
 
         // Args
         // TODO: type conversion
-        Joiner.on(',').appendTo(sb, args);
-
+//        Joiner.on(',').appendTo(sb, args);
+        sb.append(args.stream().map(Object::toString).collect(joining(",")));
         // Kwargs
         if (!kwargs.isEmpty()) {
             if (!args.isEmpty()) {
                 sb.append(',');
             }
-            Joiner.on(',').withKeyValueSeparator("=").appendTo(sb, kwargs);
+//            Joiner.on(',').withKeyValueSeparator("=").appendTo(sb, kwargs);
+            sb.append(kwargs.entrySet()
+                     .stream()
+                     .map(Object::toString)
+                     .collect(joining(",")));
         }
 
         sb.append(")");
@@ -132,7 +137,7 @@ public class CompositeBuilder<T extends Builder> implements Builder {
         }
 
         String str = sb.toString();
-        LOGGER.debug(".plot command: {}", str);
+//        LOGGER.debug(".plot command: {}", str);
         return str;
     }
 

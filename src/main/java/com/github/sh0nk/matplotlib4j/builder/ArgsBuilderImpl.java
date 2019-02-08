@@ -1,16 +1,17 @@
 package com.github.sh0nk.matplotlib4j.builder;
 
-import com.google.common.base.Joiner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import com.google.common.base.Joiner;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.stream.Collectors.joining;
 
 
 public class ArgsBuilderImpl implements Builder {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ArgsBuilderImpl.class);
+//    private final static Logger LOGGER = LoggerFactory.getLogger(ArgsBuilderImpl.class);
 
     private final String key;
     List<Object> args = new LinkedList<>();
@@ -58,11 +59,12 @@ public class ArgsBuilderImpl implements Builder {
         sb.append("plt.");
         sb.append(key);
         sb.append('(');
-        Joiner.on(',').appendTo(sb, args);
+        sb.append(args.stream().map(Object::toString).collect(joining(",")));
+//        Joiner.on(',').appendTo(sb, args);
         sb.append(')');
 
         String str = sb.toString();
-        LOGGER.debug(".plot command: {}", str);
+//        LOGGER.debug(".plot command: {}", str);
         return str;
     }
 

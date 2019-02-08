@@ -2,8 +2,8 @@ package com.github.sh0nk.matplotlib4j.builder;
 
 import com.github.sh0nk.matplotlib4j.kwargs.PatchBuilder;
 import com.github.sh0nk.matplotlib4j.kwargs.PatchBuilderImpl;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
+//import com.google.common.base.Joiner;
+//import com.google.common.base.Preconditions;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -88,8 +88,10 @@ public class HistBuilderImpl implements HistBuilder {
 
     @Override
     public HistBuilder color(String... args) {
-        Preconditions.checkArgument(args.length > 0, ".color() needs to have at least one argument.");
-        return innerBuilder.addToKwargsWithoutQuoting("color", "[\"" + Joiner.on("\", \"").join(args) + "\"]");
+//        Preconditions.checkArgument
+        assert(args.length > 0);//, ".color() needs to have at least one argument.");
+        return innerBuilder.addToKwargsWithoutQuoting("color", "[\"" + String.join("\", \"", args) + "\"]");
+//        return innerBuilder.addToKwargsWithoutQuoting("color", "[\"" + Joiner.on("\", \"").join(args) + "\"]");
     }
 
     @Override
@@ -124,7 +126,8 @@ public class HistBuilderImpl implements HistBuilder {
 
     @Override
     public String build() {
-        Preconditions.checkArgument(xList.size() > 0, ".add() is needed to be called at least once.");
+        // Preconditions.checkArgument
+        assert(xList.size() > 0);//, ".add() is needed to be called at least once.");
         innerBuilder.addToArgsWithoutQuoting(xList.toString());
         return innerBuilder.build();
     }

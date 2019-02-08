@@ -2,15 +2,15 @@ package com.github.sh0nk.matplotlib4j.builder;
 
 import com.github.sh0nk.matplotlib4j.kwargs.Line2DBuilder;
 import com.github.sh0nk.matplotlib4j.kwargs.Line2DBuilderImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 
 public class PlotBuilderImpl implements PlotBuilder {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PlotBuilderImpl.class);
+//    private final static Logger LOGGER = LoggerFactory.getLogger(PlotBuilderImpl.class);
 
     private CompositeBuilder<PlotBuilder> innerBuilder = new CompositeBuilder<>(this);
     private Line2DBuilder<PlotBuilder> line2DBuilder = new Line2DBuilderImpl<>(innerBuilder);

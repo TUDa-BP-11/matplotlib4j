@@ -1,11 +1,12 @@
 package com.github.sh0nk.matplotlib4j;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
+//import com.google.common.base.Preconditions;
+//import com.google.common.collect.ContiguousSet;
+//import com.google.common.collect.DiscreteDomain;
+//import com.google.common.collect.Range;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,17 +15,37 @@ public class NumpyUtils {
 
     // TODO: more options from numpy
     public static List<Double> linspace(double start, double end, int num) {
-        Preconditions.checkArgument(num >= 0);
-        return ContiguousSet.create(Range.closedOpen(0, num), DiscreteDomain.integers())
-                .stream().map(x -> (x  * (end - start)) / (num - 1) + start).collect(Collectors.toList());
+        assert(num >= 0);
+        List<Double> ls = new ArrayList();
+        double step = (end - start) / (num - 1);
+        double current = start;
+        while (current <= end)
+        {
+            ls.add(current);
+            current += step;
+        }
+        return ls;
+//        Preconditions.checkArgument(num >= 0);
+//        return ContiguousSet.create(Range.closedOpen(0, num), DiscreteDomain.integers())
+//                .stream().map(x -> (x  * (end - start)) / (num - 1) + start).collect(Collectors.toList());
     }
 
     public static List<Double> arange(double start, double end, double step) {
-        double scaledStart = start / step;
-        double scaledEnd = end / step;
-        double floorGap = scaledStart - (int) scaledStart;
-        return ContiguousSet.create(Range.closed((int) scaledStart, (int) scaledEnd), DiscreteDomain.integers())
-                .stream().map(x -> (x + floorGap) * step).collect(Collectors.toList());
+//        double scaledStart = start / step;
+//        double scaledEnd = end / step;
+//        double floorGap = scaledStart - (int) scaledStart;
+        
+        List<Double> ls = new ArrayList();
+        double current = start;
+        while (current <= end)
+        {
+            ls.add(current);
+            current += step;
+        }
+        return ls;
+        
+//        return ContiguousSet.create(Range.closed((int) scaledStart, (int) scaledEnd), DiscreteDomain.integers())
+//                .stream().map(x -> (x + floorGap) * step).collect(Collectors.toList());
     }
 
     public static <T extends Number> Grid<T> meshgrid(List<T> x, List<T> y) {
