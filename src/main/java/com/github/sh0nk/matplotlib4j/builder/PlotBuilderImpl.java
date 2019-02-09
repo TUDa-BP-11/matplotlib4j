@@ -12,12 +12,18 @@ public class PlotBuilderImpl implements PlotBuilder {
 
 //    private final static Logger LOGGER = LoggerFactory.getLogger(PlotBuilderImpl.class);
 
-    private CompositeBuilder<PlotBuilder> innerBuilder = new CompositeBuilder<>(this);
-    private Line2DBuilder<PlotBuilder> line2DBuilder = new Line2DBuilderImpl<>(innerBuilder);
+    private final CompositeBuilder<PlotBuilder> innerBuilder = new CompositeBuilder<>(this);
+    private final Line2DBuilder<PlotBuilder> line2DBuilder = new Line2DBuilderImpl<>(innerBuilder);
 
     @Override
     public PlotBuilder add(List<? extends Number> x) {
         return innerBuilder.addToArgs(x);
+    }
+    
+    
+    @Override
+    public PlotBuilder addDates(List<? extends Number> dateList) {
+        return innerBuilder.addDateListToArgs(dateList);
     }
 
     @Override
@@ -33,6 +39,21 @@ public class PlotBuilderImpl implements PlotBuilder {
         return innerBuilder.addToArgs(fmt);
     }
 
+    @Override
+    public PlotBuilder color(String arg){
+            return innerBuilder.addToKwargs("color", arg);
+    }
+    
+    @Override
+    public PlotBuilder marker(String arg){
+            return innerBuilder.addToKwargs("marker", arg);
+    }
+    
+    @Override
+    public PlotBuilder markersize(String arg){
+            return innerBuilder.addToKwargs("markersize", arg);
+    }
+    
     @Override
     public PlotBuilder linestyle(String arg) {
         return line2DBuilder.linestyle(arg);

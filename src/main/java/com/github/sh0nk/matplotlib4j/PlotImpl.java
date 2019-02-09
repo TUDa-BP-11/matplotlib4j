@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PlotImpl implements Plot {
     List<Builder> registeredBuilders = new LinkedList<>();
-    private List<Builder> showBuilders = new LinkedList<>();
+    private final List<Builder> showBuilders = new LinkedList<>();
 
     private final boolean dryRun;
     private final PythonConfig pythonConfig;
@@ -154,24 +154,25 @@ public class PlotImpl implements Plot {
 
     /**
      * matplotlib.pyplot.show(*args, **kw)
+     * @throws java.io.IOException
+     * @throws com.github.sh0nk.matplotlib4j.PythonExecutionException
      */
     @Override
     public void show() throws IOException, PythonExecutionException {
         List<String> scriptLines = new LinkedList<>();
         scriptLines.add("import numpy as np");
+        scriptLines.add("import matplotlib as mpl");
         if (dryRun) {
             // No need DISPLAY for test run
-            scriptLines.add("import matplotlib as mpl");
             scriptLines.add("mpl.use('Agg')");
         }
         scriptLines.add("import matplotlib.pyplot as plt");
         registeredBuilders.forEach(b -> scriptLines.add(b.build()));
-
         // show
         if (!dryRun) {
             scriptLines.add("plt.show()");
         }
-
+        
         PyCommand command = new PyCommand(pythonConfig);
         command.execute(String.join("\n", scriptLines));
 

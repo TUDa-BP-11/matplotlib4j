@@ -10,24 +10,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * {@link CompositeBuilder} handles positional arguments and keyword arguments to methods
- * by {@link #build()} call on behalf of the ownerBuilder with a common way.
+ * {@link CompositeBuilder} handles positional arguments and keyword arguments
+ * to methods by {@link #build()} call on behalf of the ownerBuilder with a
+ * common way.
  *
  * @param <T> Owner builder class
  */
 public class CompositeBuilder<T extends Builder> implements Builder {
 
 //    private final static Logger LOGGER = LoggerFactory.getLogger(CompositeBuilder.class);
-
-    private List<Object> args = new LinkedList<>();
-    private Map<String, Object> kwargs = new HashMap<>();
+    private final List<Object> args = new LinkedList<>();
+    private final Map<String, Object> kwargs = new HashMap<>();
     private String beforeMethodOutput = null;
     private String afterMethodOutput = null;
+    private String afterMethodOutputDate = null;
 
     private final T ownerBuilder;
 
     // get unique return value
-    private String retName = "ret_" + UUID.randomUUID().toString().replace('-', '_');
+    private final String retName = "ret_" + UUID.randomUUID().toString().replace('-', '_');
 
     public CompositeBuilder(T ownerBuilder) {
         this.ownerBuilder = ownerBuilder;
@@ -40,6 +41,28 @@ public class CompositeBuilder<T extends Builder> implements Builder {
 
     public T addToArgs(List<? extends Number> numbers) {
         args.add(wrapWithNdArray(TypeConversion.INSTANCE.typeSafeList(numbers).toString()));
+        return ownerBuilder;
+    }
+
+    public T addDateListToArgs(List<? extends Number> numbers) {
+        List<Object> numbersNoNull = TypeConversion.INSTANCE.typeSafeList(numbers);
+        afterMethodOutputDate = "import matplotlib.dates as mdates\n"
+//                + "days = mdates.DayLocator()\n"
+//                + "months = mdates.MonthLocator()\n"
+                + "fmt = mdates.DateFormatter('%Y-%m-%d')\n"
+                + "ax = plt.gca()\n"
+//                + "ax.xaxis.set_major_locator(months)\n"
+                + "ax.xaxis.set_major_formatter(fmt)\n"
+//                + "ax.xaxis.set_minor_locator(days) \n"
+//                + "ax.format_xdata = fmt\n"
+                + "ax.grid(True)\n";
+//                + "plt.gcf().autofmt_xdate()";
+//                "locator = mpl.dates.AutoDateLocator() \nformatter = mpl.dates.AutoDateFormatter(locator)"
+
+        String str = wrapWithNdArray("mpl.dates.epoch2num(" + numbersNoNull.toString() + ")");
+        args.add(str);
+//        System.out.println(str);
+//        System.out.println(afterMethodOutputDate);
         return ownerBuilder;
     }
 
@@ -125,9 +148,9 @@ public class CompositeBuilder<T extends Builder> implements Builder {
             }
 //            Joiner.on(',').withKeyValueSeparator("=").appendTo(sb, kwargs);
             sb.append(kwargs.entrySet()
-                     .stream()
-                     .map(Object::toString)
-                     .collect(joining(",")));
+                    .stream()
+                    .map(Object::toString)
+                    .collect(joining(",")));
         }
 
         sb.append(")");
@@ -136,7 +159,12 @@ public class CompositeBuilder<T extends Builder> implements Builder {
             sb.append('\n').append(afterMethodOutput);
         }
 
+        if (afterMethodOutputDate != null) {
+            sb.append('\n').append(afterMethodOutputDate);
+        }
+
         String str = sb.toString();
+//        System.out.println("CompositeBuilder.build(): "+str);
 //        LOGGER.debug(".plot command: {}", str);
         return str;
     }
