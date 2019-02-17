@@ -5,7 +5,6 @@ package com.github.sh0nk.matplotlib4j;
 //import com.google.common.io.Files;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PyCommand {
+
     private final PythonConfig pythonConfig;
 
     public PyCommand(PythonConfig pythonConfig) {
@@ -23,7 +23,6 @@ public class PyCommand {
     }
 
 //    private final static Logger LOGGER = LoggerFactory.getLogger(PyCommand.class);
-
     private final static Pattern ERROR_PAT = Pattern.compile("^.+Error:");
 
     private List<String> buildCommandArgs(String scriptPath) {
@@ -39,7 +38,7 @@ public class PyCommand {
         }
 
         List<String> com;
-        if (pythonConfig.getPythonBinPath() != null &&!pythonConfig.getPythonBinPath().isEmpty()) {
+        if (pythonConfig.getPythonBinPath() != null && !pythonConfig.getPythonBinPath().isEmpty()) {
             com = new ArrayList();
             com.add(pythonConfig.getPythonBinPath());
             com.add(scriptPath);
@@ -78,7 +77,6 @@ public class PyCommand {
 
         // stderr
         // TODO: have a common way with stdout
-
         br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         StringBuilder sb = new StringBuilder();
         line = br.readLine();
@@ -107,19 +105,35 @@ public class PyCommand {
         bw.close();
     }
 
-    public void execute(String pythonScript) throws IOException, PythonExecutionException {
-//        File tmpDir = Files.createTempDir();
+//    public void execute(String pythonScript) throws IOException, PythonExecutionException {
+////        File tmpDir = Files.createTempDir();
+//        Path tmpDir = Files.createTempDirectory("tmp");
+//        tmpDir.toFile().deleteOnExit();
+////        tmpDir.deleteOnExit();
+//        File script = new File(tmpDir.toFile(), "exec.py");
+//
+//        writeFile(pythonScript, script);
+//
+//        String scriptPath = Paths.get(script.toURI()).toAbsolutePath().toString();
+//        command(buildCommandArgs(scriptPath));
+//        tmpDir.toFile().delete();
+////        tmpDir.delete();
+//
+//    }
+
+    // untested
+    public void execute(String pythonScript) throws IOException, InterruptedException {
+        
         Path tmpDir = Files.createTempDirectory("tmp");
         tmpDir.toFile().deleteOnExit();
-//        tmpDir.deleteOnExit();
         File script = new File(tmpDir.toFile(), "exec.py");
 
         writeFile(pythonScript, script);
 
         String scriptPath = Paths.get(script.toURI()).toAbsolutePath().toString();
-        command(buildCommandArgs(scriptPath));
+        ProcessBuilder pb = new ProcessBuilder("python", scriptPath);
+        Process p = pb.start();
+        p.waitFor();
         tmpDir.toFile().delete();
-//        tmpDir.delete();
-        
     }
 }

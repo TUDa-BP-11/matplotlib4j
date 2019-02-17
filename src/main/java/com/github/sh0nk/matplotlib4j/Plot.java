@@ -60,7 +60,7 @@ public interface Plot {
      * Silently execute Python script until here by builders.
      * It is mostly useful to execute `plt.savefig()` without showing by window.
      */
-    void executeSilently() throws IOException, PythonExecutionException;
+    void executeSilently() throws IOException, PythonExecutionException, InterruptedException;
 
     /**
      * matplotlib.pyplot.show(*args, **kw)

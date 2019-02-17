@@ -6,8 +6,11 @@ import com.github.sh0nk.matplotlib4j.builder.*;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlotImpl implements Plot {
+
     List<Builder> registeredBuilders = new LinkedList<>();
     private final List<Builder> showBuilders = new LinkedList<>();
 
@@ -140,7 +143,7 @@ public class PlotImpl implements Plot {
     }
 
     @Override
-    public void executeSilently() throws IOException, PythonExecutionException {
+    public void executeSilently() throws IOException, PythonExecutionException, InterruptedException {
         List<String> scriptLines = new LinkedList<>();
         scriptLines.add("import numpy as np");
         scriptLines.add("import matplotlib as mpl");
@@ -154,6 +157,7 @@ public class PlotImpl implements Plot {
 
     /**
      * matplotlib.pyplot.show(*args, **kw)
+     *
      * @throws java.io.IOException
      * @throws com.github.sh0nk.matplotlib4j.PythonExecutionException
      */
@@ -172,9 +176,15 @@ public class PlotImpl implements Plot {
         if (!dryRun) {
             scriptLines.add("plt.show()");
         }
-        
+
         PyCommand command = new PyCommand(pythonConfig);
-        command.execute(String.join("\n", scriptLines));
+        new Thread(() -> {
+            try {
+                command.execute(String.join("\n", scriptLines));
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(PlotImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }).start();
 
         // After showing, registered plot is cleared
         registeredBuilders.clear();
